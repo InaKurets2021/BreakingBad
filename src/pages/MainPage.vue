@@ -1,4 +1,5 @@
 <template>
+	<div class="main"></div>
 </template >
 
 
@@ -7,5 +8,12 @@ export default {};
 </script>
 
 <style lang="scss">
- 
+.main {
+	background-image: url(../assets/img/mainjpg.jpg);
+	width: 100%;
+	height: 100%;
+	background-repeat: no-repeat;
+	background-position: center;
+  background-size: cover;
+}
 </style>
