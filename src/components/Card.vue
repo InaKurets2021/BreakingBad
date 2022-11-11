@@ -40,6 +40,9 @@ export default {
 	background: #FFFFFF;
 	box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
 	border-radius: 4px;
+	@media (max-width: 576px) {
+    max-width: 100%;
+  }
 }
 
 .card__img {

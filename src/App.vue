@@ -1,7 +1,7 @@
 <template>
   <div class="page">
     <header class="header">
-      <div class="header__container">
+      <div class="header__container container">
         <router-link to="/">
           <img src="../src/assets/img/logo.png" alt="logo">
         </router-link>
@@ -17,9 +17,9 @@
     </main>
 
     <footer class="footer">
-      <div class="footer__container">
-        <h2 class="year">2022</h2>
-        <h2 class="year">@author</h2>
+      <div class="footer__container container">
+        <h2 class="year">{{ new Date(). getFullYear()}}</h2>
+        <h2 class="year">@Ina Kurets</h2>
       </div>
     </footer>
   </div>
@@ -29,10 +29,8 @@
 .header__container,
 .footer__container {
   height: 100%;
-  max-width: 1440px;
   display: flex;
-  margin: 0 auto;
-  align-items: center;
+   align-items: center;
   justify-content: space-between;
 }
 
@@ -40,5 +38,9 @@
   border: 1.4px solid #FFD930;
   border-radius: 4px;
   padding: 8px 16px;
+}
+.main {
+  width: 100%;
+  background-color: #fbfbfb;;
 }
 </style>

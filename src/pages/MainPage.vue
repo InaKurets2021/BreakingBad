@@ -1,5 +1,5 @@
 <template>
-	<div class="main"></div>
+	<div class="main-page"></div>
 </template >
 
 
@@ -8,7 +8,7 @@ export default {};
 </script>
 
 <style lang="scss">
-.main {
+.main-page {
 	background-image: url(../assets/img/mainjpg.jpg);
 	width: 100%;
 	height: 100%;

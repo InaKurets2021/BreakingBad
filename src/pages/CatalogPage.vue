@@ -1,7 +1,7 @@
 <template>
   <div class="catalog">
     <div class="container">
-      <form class="search" @submit.prevent="searchPersona">
+      <form class="search" @submit.prevent="searchPerson">
         <input type="text" class="search__input" placeholder="Поиск" v-model="searchValue">
         <button class="search__button">
           <svg class="search__svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
@@ -12,14 +12,29 @@
           </svg> Найти
         </button>
       </form>
-      <div class="card-list">
-        <Loader v-if="isLoading" />
-        <div class="card-item" v-for="card in cards" :key="card.char_id">
+      <h1 class="catalog__title">Каталог</h1>
+      <Loader v-if="isLoading" />
+
+      <div class="card-list" v-if="cards">
+               <div class="card-item" v-for="card in cards" :key="card.char_id">
           <router-link :to="`persona/${card.char_id}`">
             <Card :name="card.name" :status="card.status" :birthday="card.birthday" :img="card.img" />
           </router-link>
         </div>
       </div>
+      <div class="card-list" v-if="personSearch">
+        <div class="card-item" v-for="card in personSearch" :key="card.char_id">
+          <router-link :to="`persona/${card.char_id}`">
+            <Card
+              :name="card.name"
+              :status="card.status"
+              :birthday="card.birthday"
+              :img="card.img"
+            />
+          </router-link>
+        </div>
+      </div>
+
     </div>
   </div>
 </template>
@@ -37,33 +52,44 @@ export default {
       cards: null,
       isLoading: false,
       searchValue: "",
+      personSearch: null,
+ 
     };
   },
   mounted() {
-    this.getPersonaAll();
+    this.getPersonsAll();
   },
 
   methods: {
-    getPersonaAll() {
+    getPersonsAll() {
       this.isLoading = true;
       fetch("https://www.breakingbadapi.com/api/characters?limit=8")
         .then((res) => res.json())
-        .then((catalog) => (this.cards = catalog));
-      this.isLoading = false;
-    },
-    searchPersona() {
-      fetch(`https://www.breakingbadapi.com/api/characters?name=${this.searchValue}`)
-        .then((res) => res.json())
-        .then((persona) => {
-          this.person = persona[0];
+        .then((catalog) => {
+          this.cards = catalog;
           this.isLoading = false;
         });
-    }
+    },
+    searchPerson() {
+      this.cards = null; 
+      this.isLoading = true;
+      fetch(`https://www.breakingbadapi.com/api/characters?name=${this.searchValue}`)
+        .then((res) => res.json())
+        .then((persons) => {
+          this.personSearch = persons;
+          this.isLoading = false;
+        });
+    },
+
   },
 };
 </script>
 
 <style lang="scss">
+.catalog {
+  padding-top: 80px;
+  padding-bottom: 80px;
+}
 .search {
   display: flex;
   background: #FFFFFF;
@@ -73,14 +99,17 @@ export default {
   width: 100%;
   height: 56px;
   margin: 0 auto;
-  padding: 16px 24px;
+  margin-bottom: 80px;
+  padding-left: 24px;
   justify-content: space-between;
 }
 
 .search__input {
+  width: 100%;
+}
+.search__input::placeholder {
   opacity: 0.4;
 }
-
 .search__svg {
   margin-right: 13px;
 }
@@ -90,7 +119,8 @@ export default {
   display: flex;
   background: none;
   align-items: center;
-
+  border-radius: 4px;
+  transition: all 0.3s;
   &:hover {
     background-color: #FFD930;
     color: #FFFFFF;
@@ -106,5 +136,17 @@ export default {
   column-gap: 32px;
   row-gap: 24px;
   min-height: 270px;
+  @media (max-width: 1000px) {
+    grid-template-columns: 1fr 1fr;
   }
+  @media (max-width: 576px) {
+    grid-template-columns: 1fr;
+  }
+  }
+  .catalog__pages {
+  display: flex;
+  justify-content: space-between;
+  gap: 5px;
+}
+
 </style>

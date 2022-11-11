@@ -1,4 +1,4 @@
-@import url("https://fonts.google.com/share?selection.family=Roboto:wght@400;500");
+@import url("https://fonts.googleapis.com/css2?family=Roboto&display=swap");
 
 body {
 	font-family: 'Roboto', sans-serif;
@@ -18,8 +18,8 @@ body {
   max-width: 1440px;
 }
 .container {
-	background-color: #F5F5F5;
-	height: 100%;
-  width: 100%;
+	max-width: 1230px;
+  padding: 0 15px;
+  margin: 0 auto;
   }
 
