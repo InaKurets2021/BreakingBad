@@ -16,7 +16,7 @@
       <Loader v-if="isLoading" />
 
       <div class="card-list" v-if="cards">
-               <div class="card-item" v-for="card in cards" :key="card.char_id">
+        <div class="card-item" v-for="card in cards" :key="card.char_id">
           <router-link :to="`persona/${card.char_id}`">
             <Card :name="card.name" :status="card.status" :birthday="card.birthday" :img="card.img" />
           </router-link>
@@ -25,16 +25,19 @@
       <div class="card-list" v-if="personSearch">
         <div class="card-item" v-for="card in personSearch" :key="card.char_id">
           <router-link :to="`persona/${card.char_id}`">
-            <Card
-              :name="card.name"
-              :status="card.status"
-              :birthday="card.birthday"
-              :img="card.img"
-            />
+            <Card :name="card.name" :status="card.status" :birthday="card.birthday" :img="card.img" />
           </router-link>
         </div>
       </div>
 
+      <div class="catalog__footer">
+        <div>pagination</div>
+        <ul class="show-card">
+          <p class="show-card__text">Отобразить карточек:</p>
+          <li class="show-card__item " :class="{ active: limit == item }" v-for="item in showCard" :key="item"
+            @click="showCardCount(item)"> {{ item }}</li>
+        </ul>
+      </div>
     </div>
   </div>
 </template>
@@ -53,17 +56,22 @@ export default {
       isLoading: false,
       searchValue: "",
       personSearch: null,
- 
+      showCard: [5, 10, 15, 20],
+      limit: 5,
     };
   },
   mounted() {
     this.getPersonsAll();
   },
-
+  watch: {
+    limit() {
+      this.getPersonsAll();
+    },
+  },
   methods: {
     getPersonsAll() {
       this.isLoading = true;
-      fetch("https://www.breakingbadapi.com/api/characters?limit=8")
+      fetch(`https://www.breakingbadapi.com/api/characters?limit=${this.limit}`)
         .then((res) => res.json())
         .then((catalog) => {
           this.cards = catalog;
@@ -71,7 +79,10 @@ export default {
         });
     },
     searchPerson() {
-      this.cards = null; 
+      if (this.searchValue == "") {
+        return;
+      }
+      this.cards = null;
       this.isLoading = true;
       fetch(`https://www.breakingbadapi.com/api/characters?name=${this.searchValue}`)
         .then((res) => res.json())
@@ -79,8 +90,11 @@ export default {
           this.personSearch = persons;
           this.isLoading = false;
         });
+      this.searchValue = "";
     },
-
+    showCardCount(item) {
+      this.limit = item;
+    },
   },
 };
 </script>
@@ -90,6 +104,7 @@ export default {
   padding-top: 80px;
   padding-bottom: 80px;
 }
+
 .search {
   display: flex;
   background: #FFFFFF;
@@ -107,9 +122,11 @@ export default {
 .search__input {
   width: 100%;
 }
+
 .search__input::placeholder {
   opacity: 0.4;
 }
+
 .search__svg {
   margin-right: 13px;
 }
@@ -121,6 +138,7 @@ export default {
   align-items: center;
   border-radius: 4px;
   transition: all 0.3s;
+
   &:hover {
     background-color: #FFD930;
     color: #FFFFFF;
@@ -130,23 +148,47 @@ export default {
     }
   }
 }
+
 .card-list {
-   display: grid;
+  display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   column-gap: 32px;
   row-gap: 24px;
   min-height: 270px;
+
   @media (max-width: 1000px) {
     grid-template-columns: 1fr 1fr;
   }
+
   @media (max-width: 576px) {
     grid-template-columns: 1fr;
   }
-  }
-  .catalog__pages {
-  display: flex;
-  justify-content: space-between;
-  gap: 5px;
 }
 
+
+.catalog__footer {
+  display: flex;
+  justify-content: space-between;
+}
+
+.show-card {
+  display: flex;
+  gap: 25px;
+  align-items: center;
+}
+
+.show-card__item {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+}
+  .active {
+  background: #FFFFFF;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  color: #ffd930;
+}
 </style>
