@@ -17,9 +17,10 @@
 					<div class="person__info-name">{{ person.name }}</div>
 					<div class="person__info-birthday"> <span>Дата рождения:</span> {{ person.birthday }}</div>
 					<div class="person__info-nickname"> <span>Ник-нейм:</span> {{ person.nickname }}</div>
-					<blockquote person__info-quote><span>Цитата</span>Lorem ipsum dolor sit amet, consectetur
-						adipiscing elit. Non, aliquam laoreet vivamus sed. Diam fames mi,
-						quam tellus cursus volutpat velit massa.</blockquote>
+					<blockquote person__info-quote v-if="randomQuote">
+						<span>Цитата: </span>
+						{{ randomQuote.quote }}
+					</blockquote>
 				</div>
 			</div>
 		</div>
@@ -36,6 +37,7 @@ export default {
 		return {
 			person: null,
 			isLoading: false,
+			randomQuote: null,
 		};
 	},
 	mounted() {
@@ -49,7 +51,15 @@ export default {
 				.then((res) => res.json())
 				.then((persona) => {
 					this.person = persona[0];
+					this.getRandomQuote();
 					this.isLoading = false;
+				});
+		},
+		getRandomQuote() {
+			fetch(`https://www.breakingbadapi.com/api/quote/random`)
+				.then((res) => res.json())
+				.then((quote) => {
+					this.randomQuote = quote[0];
 				});
 		},
 	},
@@ -131,20 +141,24 @@ export default {
 
 .person__info-birthday {
 	margin-bottom: 16px;
-  span {
-    color: #a9a9a9;
-  }
+
+	span {
+		color: #a9a9a9;
+	}
 }
 
 .person__info-nickname {
 	margin-bottom: 32px;
-  span {
-    color: #a9a9a9;
-  }
+
+	span {
+		color: #a9a9a9;
+	}
+	
 }
+
 .person__info-quote {
-  span {
-    color: #a9a9a9;
-  }
+	span {
+		color: #a9a9a9;
+	}
 }
 </style>
