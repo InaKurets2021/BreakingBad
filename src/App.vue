@@ -38,6 +38,14 @@
   border: 1.4px solid #FFD930;
   border-radius: 4px;
   padding: 8px 16px;
+color: #2D2D2D;
+transition: background-color .3s ;
+&:hover{
+background-color: #FFD930;
+}
+&.router-link-active {
+  background-color: #FFD930;
+}
 }
 .main {
   width: 100%;

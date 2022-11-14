@@ -12,13 +12,30 @@
           </svg> Найти
         </button>
       </form>
-      <h1 class="catalog__title">Каталог</h1>
+      <div class="catalog__top">
+        <h1 class="catalog__title">Каталог</h1>
+        <div class="catalog__icons">
+          <svg class="catalog__svg" :class="{ active: grid == true }" @click="grid = true" width="24" height="24"
+            viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="1" y="1" width="22" height="9" rx="1" stroke="#2D2D2D" stroke-width="1" />
+            <rect x="1" y="14" width="22" height="9" rx="1" stroke="#2D2D2D" stroke-width="1" />
+          </svg>
+          <svg class="catalog__svg" :class="{ active: grid == false }" @click="grid = false" width="24" height="24"
+            viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="1" y="1" width="9" height="9" rx="1" stroke="#2D2D2D" stroke-width="1" />
+            <rect x="1" y="14" width="9" height="9" rx="1" stroke="#2D2D2D" stroke-width="1" />
+            <rect x="14" y="1" width="9" height="9" rx="1" stroke="#2D2D2D" stroke-width="1" />
+            <rect x="14" y="14" width="9" height="9" rx="1" stroke="#2D2D2D" stroke-width="1" />
+          </svg>
+        </div>
+      </div>
+
       <Loader v-if="isLoading" />
 
-      <div class="card-list" v-if="cards">
+      <div class="card-list" :class="{ active: grid == true }" v-if="cards">
         <div class="card-item" v-for="card in cards" :key="card.char_id">
           <router-link :to="`persona/${card.char_id}`">
-            <Card :name="card.name" :status="card.status" :birthday="card.birthday" :img="card.img" />
+            <Card :name="card.name" :status="card.status" :birthday="card.birthday" :img="card.img" :grid="grid" />
           </router-link>
         </div>
       </div>
@@ -58,6 +75,7 @@ export default {
       personSearch: null,
       showCard: [5, 10, 15, 20],
       limit: 5,
+      grid: false,
     };
   },
   mounted() {
@@ -70,6 +88,7 @@ export default {
   },
   methods: {
     getPersonsAll() {
+      this.cards = null;
       this.isLoading = true;
       fetch(`https://www.breakingbadapi.com/api/characters?limit=${this.limit}`)
         .then((res) => res.json())
@@ -149,6 +168,35 @@ export default {
   }
 }
 
+.catalog__top {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 25px;
+  align-items: center;
+}
+
+.catalog__title {
+  font-weight: 500;
+  font-size: 32px;
+  line-height: 40px;
+}
+
+.catalog__icons {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.catalog__svg {
+  cursor: pointer;
+
+  &.active {
+    rect {
+      stroke: #FFD930;
+    }
+  }
+}
+
 .card-list {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
@@ -163,8 +211,16 @@ export default {
   @media (max-width: 576px) {
     grid-template-columns: 1fr;
   }
-}
 
+  &.active {
+    grid-template-columns: 1fr;
+    gap: 0;
+
+    .card-item:last-child {
+      border-bottom: 1px solid #a9a9a9;
+    }
+  }
+}
 
 .catalog__footer {
   display: flex;
@@ -184,11 +240,12 @@ export default {
   width: 32px;
   height: 32px;
   cursor: pointer;
-}
-  .active {
-  background: #FFFFFF;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-  border-radius: 4px;
-  color: #ffd930;
+
+  &.active {
+    background: #FFFFFF;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+    color: #ffd930;
+  }
 }
 </style>

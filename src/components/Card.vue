@@ -1,5 +1,5 @@
 <template>
-	<div class="card">
+	<div class="card" :class="{ active: grid == true }">
 		<div class="card__img">
 			<img :src="img" alt="" />
 		</div>
@@ -26,6 +26,9 @@ export default {
 		img: {
 			type: String
 		},
+		grid: {
+			type: Boolean
+		},
 	}
 }
 
@@ -40,32 +43,63 @@ export default {
 	background: #FFFFFF;
 	box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
 	border-radius: 4px;
+
 	@media (max-width: 576px) {
-    max-width: 100%;
-  }
+		max-width: 100%;
+	}
+
+	&.active {
+		max-width: 100%;
+		padding: 8px 0;
+		border-top: 1px solid #a9a9a9;
+
+		.card__img {
+			margin-right: 40px;
+			width: 64px;
+			height: 64px;
+		}
+
+		.card__status {
+			text-align: center;
+		}
+
+		.card__description {
+			margin: 0;
+			display: grid;
+			grid-template-columns: 130px 200px 200px;
+			align-items: center;
+			gap: 140px;
+		}
+
+		.card__name {
+			margin-top: 0;
+		}
+	}
 }
 
 .card__img {
 	width: 124px;
 	height: 124px;
+
 	img {
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
 		object-position: top;
 	}
-
 }
-.card__description{
+
+.card__description {
 	margin: 16px 20px;
 }
+
 .card__status {
 	background: rgba(48, 255, 30, 0.2);
 	letter-spacing: 0.06em;
 	font-variant: small-caps;
 	color: #51E245;
 	padding: 8px 12px;
-	}
+}
 
 .card__name {
 	color: #2D2D2D;
