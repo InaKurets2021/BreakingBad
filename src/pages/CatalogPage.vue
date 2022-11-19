@@ -31,7 +31,11 @@
       </div>
 
       <Loader v-if="isLoading" />
-
+      <div class="cards-titles " v-if="grid == true">
+        <div class="cards-titles__status">Статус</div>
+        <div class="cards-titles__name">Имя</div>
+        <div class="cards-titles__birthday">Дата рождения</div>
+      </div>
       <div class="card-list" :class="{ active: grid == true }" v-if="cards">
         <div class="card-item" v-for="card in cards" :key="card.char_id">
           <router-link :to="`persona/${card.char_id}`">
@@ -48,7 +52,11 @@
       </div>
 
       <div class="catalog__footer">
-        <div>pagination</div>
+        <ul class="pagination">
+          <li class="pagination__item" :class="{ active: page == currentPage }" v-for="page in pages" :key="page"
+            @click="paginationCharacters(page)">
+            {{ page }}</li>
+        </ul>
         <ul class="show-card">
           <p class="show-card__text">Отобразить карточек:</p>
           <li class="show-card__item " :class="{ active: limit == item }" v-for="item in showCard" :key="item"
@@ -76,21 +84,49 @@ export default {
       showCard: [5, 10, 15, 20],
       limit: 5,
       grid: false,
+      count: 62,
+      limit: 10,
+      currentPage: 1,
     };
+  },
+  computed: {
+    pages() {
+      const pages = Math.ceil(this.count / this.limit)
+      const arr = [];
+      for (let i = 1; i <= pages; i++) {
+        arr.push(i)
+      }
+      return arr;
+    },
+    offset() {
+      return this.currentPage * this.limit - this.limit;
+    },
   },
   mounted() {
     this.getPersonsAll();
+    this.getPersons();
   },
   watch: {
     limit() {
       this.getPersonsAll();
     },
+    currentPage() {
+      this.getPersonsAll();
+    },
   },
   methods: {
+    getPersons() {
+      fetch(`https://www.breakingbadapi.com/api/characters`)
+        .then((res) => res.json())
+        .then((data) => {
+          this.count = data.length;
+        });
+    },
+
     getPersonsAll() {
       this.cards = null;
       this.isLoading = true;
-      fetch(`https://www.breakingbadapi.com/api/characters?limit=${this.limit}`)
+      fetch(`https://www.breakingbadapi.com/api/characters?limit=${this.limit}&offset=${this.offset}`)
         .then((res) => res.json())
         .then((catalog) => {
           this.cards = catalog;
@@ -114,11 +150,37 @@ export default {
     showCardCount(item) {
       this.limit = item;
     },
+    paginationCharacters(page) {
+      this.currentPage = page;
+    },
   },
 };
 </script>
 
 <style lang="scss">
+.pagination {
+  display: flex;
+  align-items: center;
+}
+.pagination__item {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+
+  &.active {
+    background: #ffffff;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+    color: #ffd930;
+  }
+}
+.cars-titles {
+  display: flex;
+}
+
 .catalog {
   padding-top: 80px;
   padding-bottom: 80px;
@@ -195,6 +257,11 @@ export default {
       stroke: #FFD930;
     }
   }
+}
+
+.cards-titles {
+  display: flex;
+
 }
 
 .card-list {

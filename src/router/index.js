@@ -21,7 +21,7 @@ const routes = [
     component: PersonaPage,
   },
   {
-    path: "/:pathMatch(.)",
+    path: "/:pathMatch(.*)*",
     name: "not-found",
     component: NotFoundPage,
   },
