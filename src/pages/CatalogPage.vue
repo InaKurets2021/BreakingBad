@@ -1,6 +1,7 @@
 <template>
   <div class="catalog">
     <div class="container">
+      
       <form class="search" @submit.prevent="searchPerson">
         <input type="text" class="search__input" placeholder="Поиск" v-model="searchValue">
         <button class="search__button">
@@ -12,6 +13,7 @@
           </svg> Найти
         </button>
       </form>
+
       <div class="catalog__top">
         <h1 class="catalog__title">Каталог</h1>
         <div class="catalog__icons">
@@ -31,37 +33,56 @@
       </div>
 
       <Loader v-if="isLoading" />
+
       <div class="cards-titles " v-if="grid == true">
         <div class="cards-titles__status">Статус</div>
         <div class="cards-titles__name">Имя</div>
         <div class="cards-titles__birthday">Дата рождения</div>
       </div>
-      <div class="card-list" :class="{ active: grid == true }" v-if="cards">
-        <div class="card-item" v-for="card in cards" :key="card.char_id">
-          <router-link :to="`persona/${card.char_id}`">
-            <Card :name="card.name" :status="card.status" :birthday="card.birthday" :img="card.img" :grid="grid" />
-          </router-link>
+
+      <div class="catalog__content" v-if="personSearch == null">
+        <div class="card-list" :class="{ active: grid == true }" v-if="cards">
+          <div class="card-item" v-for="card in cards" :key="card.char_id">
+            <router-link :to="`persona/${card.char_id}`">
+              <Card :name="card.name" :status="card.status" :birthday="card.birthday" :img="card.img" :grid="grid" />
+            </router-link>
+          </div>
         </div>
-      </div>
-      <div class="card-list" v-if="personSearch">
-        <div class="card-item" v-for="card in personSearch" :key="card.char_id">
-          <router-link :to="`persona/${card.char_id}`">
-            <Card :name="card.name" :status="card.status" :birthday="card.birthday" :img="card.img" />
-          </router-link>
+        <div class="card-list" v-if="personSearch">
+          <div class="card-item" v-for="card in personSearch" :key="card.char_id">
+            <router-link :to="`persona/${card.char_id}`">
+              <Card :name="card.name" :status="card.status" :birthday="card.birthday" :img="card.img" />
+            </router-link>
+          </div>
         </div>
       </div>
 
-      <div class="catalog__footer">
+      <div class="catalog__footer" v-if="showCatalogFooter == true">
         <ul class="pagination">
           <li class="pagination__item" :class="{ active: page == currentPage }" v-for="page in pages" :key="page"
             @click="paginationCharacters(page)">
             {{ page }}</li>
+
+          <div class="pagination__btns">
+
+            <button class="pagination__btn" @click="prevPage"><svg width="18" height="18" viewBox="0 0 18 18"
+                fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M10 1L2 9M2 9L10 17M2 9H18" stroke="#FFD930" stroke-width="2" />
+              </svg></button>
+
+            <button class="pagination__btn" @click="nextPage"><svg width="18" height="18" viewBox="0 0 18 18"
+                fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M8 1L16 9M16 9L8 17M16 9H0" stroke="#FFD930" stroke-width="2" />
+              </svg>
+            </button>
+          </div>
         </ul>
         <ul class="show-card">
           <p class="show-card__text">Отобразить карточек:</p>
           <li class="show-card__item " :class="{ active: limit == item }" v-for="item in showCard" :key="item"
             @click="showCardCount(item)"> {{ item }}</li>
         </ul>
+
       </div>
     </div>
   </div>
@@ -81,12 +102,13 @@ export default {
       isLoading: false,
       searchValue: "",
       personSearch: null,
-      showCard: [5, 10, 15, 20],
-      limit: 5,
+      showCard: [10, 15, 20, 25],
+      limit: 10,
       grid: false,
-      count: 62,
+      count: null,
       limit: 10,
       currentPage: 1,
+      showCatalogFooter: false,
     };
   },
   computed: {
@@ -122,7 +144,6 @@ export default {
           this.count = data.length;
         });
     },
-
     getPersonsAll() {
       this.cards = null;
       this.isLoading = true;
@@ -131,6 +152,7 @@ export default {
         .then((catalog) => {
           this.cards = catalog;
           this.isLoading = false;
+          this.showCatalogFooter = true;
         });
     },
     searchPerson() {
@@ -149,9 +171,21 @@ export default {
     },
     showCardCount(item) {
       this.limit = item;
+      const newPages = Math.ceil(this.count / item);
+      if (newPages <= currentPage) {
+        this.currentPage = newPage;
+      }
     },
     paginationCharacters(page) {
       this.currentPage = page;
+    },
+    prevPage() {
+      if (this.currentPage <= 1) return;
+      this.currentPage--;
+    },
+    nextPage() {
+      if (this.currentPage >= this.pages.length) return;
+      this.currentPage++;
     },
   },
 };
@@ -162,6 +196,16 @@ export default {
   display: flex;
   align-items: center;
 }
+
+.pagination__btns {
+  display: flex;
+  gap: 24px;
+}
+
+.pagination__btn {
+  background: none;
+}
+
 .pagination__item {
   display: flex;
   justify-content: center;
@@ -177,8 +221,22 @@ export default {
     color: #ffd930;
   }
 }
-.cars-titles {
+
+.cards-titles {
   display: flex;
+  margin-bottom: 24px;
+}
+
+.cards-titles__status {
+  margin-left: 110px;
+}
+
+.cards-titles__name {
+  margin-left: 210px;
+}
+
+.cards-titles__birthday {
+  margin-left: 300px;
 }
 
 .catalog {
@@ -261,7 +319,11 @@ export default {
 
 .cards-titles {
   display: flex;
+}
 
+.catalog__content {
+  margin-bottom: 48px;
+  min-height: 570px;
 }
 
 .card-list {
