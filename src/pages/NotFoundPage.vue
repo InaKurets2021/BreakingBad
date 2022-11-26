@@ -1,23 +1,13 @@
 <template>
-  <div id="notfound">
-    <div class="notfound">
-      <div class="notfound-404">
-        <h1>404</h1>
-        <h2>Page not found</h2>
+  <div class="notfound">
+    <div class="notfound__container">
+      <div class="notfound__info">
+        <h1 class="notfound__title">404</h1>
+        <h2 class="notfound__subtitle">Page not found</h2>
       </div>
-      <router-link class="go-home" to="/">
-        <svg
-          width="18"
-          height="18"
-          viewBox="0 0 18 18"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M10 1L2 9M2 9L10 17M2 9H18"
-            stroke="#FFD930"
-            stroke-width="2"
-          />
+      <router-link class="notfound__link" to="/">
+        <svg class="notfound__svg">
+          <use xlink:href="../assets/img/sprite.svg#arrow" />
         </svg>
         На главную
       </router-link>
@@ -27,36 +17,28 @@
 
 <script>
 </script>
-
-
 <style lang="scss">
-#notfound {
+.notfound {
   position: relative;
   height: 100%;
 }
-
-#notfound .notfound {
+.notfound__container {
+  max-width: 767px;
+  width: 100%;
+  line-height: 1.4;
+  text-align: center;
   position: absolute;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
 }
-
-.notfound {
-  max-width: 767px;
-  width: 100%;
-  line-height: 1.4;
-  text-align: center;
-}
-
-.notfound .notfound-404 {
+.notfound__info {
   position: relative;
   height: 180px;
   margin-bottom: 20px;
   z-index: -1;
 }
-
-.notfound .notfound-404 h1 {
+.notfound__title {
   position: absolute;
   left: 50%;
   top: 50%;
@@ -71,8 +53,7 @@
   text-shadow: -1px -1px 0px #ffd930, 1px 1px 0px #ffd930;
   letter-spacing: -20px;
 }
-
-.notfound .notfound-404 h2 {
+.notfound__subtitle {
   position: absolute;
   left: 0;
   right: 0;
@@ -85,7 +66,7 @@
   letter-spacing: 13px;
   margin: 0;
 }
-.notfound .go-home {
+.notfound__link {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -97,20 +78,27 @@
   line-height: 24px;
   color: #2d2d2d;
   transition: color 0.3s;
-
   &:hover {
     color: #ffd930;
+    .notfound__svg {
+      stroke: #ffd930;
+    }
   }
 }
-
+.notfound__svg {
+  width: 18px;
+  height: 18px;
+  stroke: #2d2d2d;
+  transition: stroke 0.3s;
+}
 @media (max-width: 767px) {
-  .notfound .notfound-404 h2 {
+  .notfound__subtitle {
     font-size: 24px;
   }
 }
 
 @media (max-width: 480px) {
-  .notfound .notfound-404 h1 {
+  .notfound__title {
     font-size: 182px;
   }
 }

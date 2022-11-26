@@ -1,19 +1,27 @@
-# breaking
+# Учебный проект Breaking Bad
 
-## Project setup
-```
-npm install
-```
+### Быстрый старт:
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
+- Клонируйте репозиторий: `git clone https://github.com/InaKurets2021/BreakingBad.git`
+- Установите зависимости: `yarn install` или `npm install`
+- Запустите проект: `yarn serve` или `npm run serve`
 
-### Compiles and minifies for production
-```
-npm run build
-```
+### Стэк используемых технологий:
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+- HTML
+- SCSS
+- Vue
+- Vue-router
+- Js
+
+### Реализовано в проекте:
+
+- Роутинг
+- Пагинация
+- Сортировка
+- Поиск
+- grid / column отображение персонажей
+
+### Демо сайта:
+
+[Breaking Bad](https://inakurets2021.github.io/BreakingBad/)

@@ -1,0 +1,182 @@
+<template>
+  <div class="person-page">
+    <div class="container">
+      <router-link class="person__link" to="/catalog">
+        <svg class="person__svg">
+          <use xlink:href="../assets/img/sprite.svg#arrow"></use>
+        </svg>
+        Назад в Каталог
+      </router-link>
+      <Loader v-if="isLoading" />
+      <div class="person-page__info">
+        <div class="person" v-if="person">
+          <div class="person__photo">
+            <img :src="person.img" alt="" />
+          </div>
+          <div class="person__info">
+            <span class="person__info-status">{{ person.status }}</span>
+            <div class="person__info-name">{{ person.name }}</div>
+            <div class="person__info-birthday">
+              <span>Дата рождения:</span> {{ person.birthday }}
+            </div>
+            <div class="person__info-nickname">
+              <span>Ник-нейм:</span> {{ person.nickname }}
+            </div>
+            <blockquote person__info-quote v-if="randomQuote">
+              <span>Цитата: </span>
+              {{ randomQuote.quote }}
+            </blockquote>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import Loader from "../components/Loader.vue";
+export default {
+  components: {
+    Loader,
+  },
+  data() {
+    return {
+      person: null,
+      isLoading: false,
+      randomQuote: null,
+    };
+  },
+  mounted() {
+    const id = Number(this.$route.params.id) || 0;
+    this.getPersonOne(id);
+  },
+  methods: {
+    getPersonOne(id) {
+      this.isLoading = true;
+
+      fetch(`https://www.breakingbadapi.com/api/characters/${id}`)
+        .then((res) => res.json())
+        .then((person) => {
+          if (person.length > 0) {
+            this.person = person[0];
+            this.getRandomQuote();
+            this.isLoading = false;
+          } else {
+            this.$router.push({ name: "not-found" });
+          }
+        });
+    },
+    getRandomQuote() {
+      fetch(`https://www.breakingbadapi.com/api/quote/random`)
+        .then((res) => res.json())
+        .then((quote) => {
+          this.randomQuote = quote[0];
+        });
+    },
+  },
+};
+</script>
+
+<style lang="scss">
+.person-page {
+  padding-top: 40px;
+  padding-bottom: 40px;
+}
+.person__link {
+  margin-bottom: 48px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+
+  font-family: "Roboto";
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 24px;
+  color: #2d2d2d;
+  transition: color 0.3s;
+
+  &:hover {
+    color: #ffd930;
+  }
+}
+.person__svg {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  stroke: #ffd930;
+}
+.person-page__info {
+  position: relative;
+  min-height: 585px;
+}
+.person {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 103px;
+
+  @media (max-width: 1100px) {
+    justify-content: center;
+  }
+}
+
+.person__photo {
+  max-width: 585px;
+  width: 100%;
+  max-height: 585px;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top;
+  }
+}
+
+.person__info {
+  max-width: 410px;
+
+  @media (max-width: 1100px) {
+    text-align: center;
+  }
+}
+
+.person__info-status {
+  display: inline-block;
+  background: rgba(48, 255, 30, 0.2);
+  letter-spacing: 0.06em;
+  font-variant: small-caps;
+  color: #51e245;
+  padding: 8px 12px;
+  margin-bottom: 32px;
+}
+
+.person__info-name {
+  font-weight: 500;
+  font-size: 32px;
+  line-height: 40px;
+  margin-bottom: 16px;
+}
+
+.person__info-birthday {
+  margin-bottom: 16px;
+
+  span {
+    color: #a9a9a9;
+  }
+}
+
+.person__info-nickname {
+  margin-bottom: 32px;
+
+  span {
+    color: #a9a9a9;
+  }
+}
+
+.person__info-quote {
+  span {
+    color: #a9a9a9;
+  }
+}
+</style>

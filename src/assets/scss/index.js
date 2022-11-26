@@ -1,6 +1,2 @@
 import "./nullstyle.scss";
-import './vars.scss';
-import './main.scss';
-
-
-
+import "./main.scss";

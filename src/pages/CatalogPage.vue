@@ -1,122 +1,105 @@
 <template>
   <div class="catalog">
     <div class="container">
-      
-      <form class="search" @submit.prevent="searchPerson">
-        <input type="text" class="search__input" placeholder="Поиск" v-model="searchValue">
-        <button class="search__button">
-          <svg class="search__svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-            xmlns="http://www.w3.org/2000/svg">
-            <path fill-rule="evenodd" clip-rule="evenodd"
-              d="M17 11.5C17 14.5376 14.5376 17 11.5 17C8.46243 17 6 14.5376 6 11.5C6 8.46243 8.46243 6 11.5 6C14.5376 6 17 8.46243 17 11.5ZM19 11.5C19 15.6421 15.6421 19 11.5 19C7.35786 19 4 15.6421 4 11.5C4 7.35786 7.35786 4 11.5 4C15.6421 4 19 7.35786 19 11.5ZM16.2929 17.7071L20.2929 21.7071L21.7071 20.2929L17.7071 16.2929L16.2929 17.7071Z"
-              fill="#FFD930" />
-          </svg> Найти
-        </button>
-      </form>
+      <Loader v-if="isLoading" />
+
+      <Search @onSearchPersons="searchPersons" />
 
       <div class="catalog__top">
         <h1 class="catalog__title">Каталог</h1>
-        <div class="catalog__icons">
-          <svg class="catalog__svg" :class="{ active: grid == true }" @click="grid = true" width="24" height="24"
-            viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect x="1" y="1" width="22" height="9" rx="1" stroke="#2D2D2D" stroke-width="1" />
-            <rect x="1" y="14" width="22" height="9" rx="1" stroke="#2D2D2D" stroke-width="1" />
+        <div class="catalog__icons" v-if="!searchEmpty">
+          <svg
+            class="catalog__svg"
+            :class="{ active: grid === true }"
+            @click="grid = true"
+          >
+            <use xlink:href="../assets/img/sprite.svg#grid"></use>
           </svg>
-          <svg class="catalog__svg" :class="{ active: grid == false }" @click="grid = false" width="24" height="24"
-            viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect x="1" y="1" width="9" height="9" rx="1" stroke="#2D2D2D" stroke-width="1" />
-            <rect x="1" y="14" width="9" height="9" rx="1" stroke="#2D2D2D" stroke-width="1" />
-            <rect x="14" y="1" width="9" height="9" rx="1" stroke="#2D2D2D" stroke-width="1" />
-            <rect x="14" y="14" width="9" height="9" rx="1" stroke="#2D2D2D" stroke-width="1" />
+          <svg
+            class="catalog__svg"
+            :class="{ active: grid === false }"
+            @click="grid = false"
+          >
+            <use xlink:href="../assets/img/sprite.svg#column" />
           </svg>
         </div>
       </div>
 
-      <Loader v-if="isLoading" />
+      
+      <div class="catalog__content" :class="{ 'no-result': searchEmpty }">
+        <CardList :persons="persons" :grid="grid" />
 
-      <div class="cards-titles " v-if="grid == true">
-        <div class="cards-titles__status">Статус</div>
-        <div class="cards-titles__name">Имя</div>
-        <div class="cards-titles__birthday">Дата рождения</div>
+        <div class="catalog__no-result" v-if="searchEmpty === true">
+          По Вашему запросу ничего не найдено
+        </div>
+        <button
+          class="catalog__back"
+          v-if="showBtnBackCatalog === true"
+          @click="getPersonsAll"
+        >
+          <svg class="person__svg">
+            <use xlink:href="../assets/img/sprite.svg#arrow"></use>
+          </svg>
+          Назад в каталог
+        </button>
       </div>
 
-      <div class="catalog__content" v-if="personSearch == null">
-        <div class="card-list" :class="{ active: grid == true }" v-if="cards">
-          <div class="card-item" v-for="card in cards" :key="card.char_id">
-            <router-link :to="`persona/${card.char_id}`">
-              <Card :name="card.name" :status="card.status" :birthday="card.birthday" :img="card.img" :grid="grid" />
-            </router-link>
-          </div>
-        </div>
-        <div class="card-list" v-if="personSearch">
-          <div class="card-item" v-for="card in personSearch" :key="card.char_id">
-            <router-link :to="`persona/${card.char_id}`">
-              <Card :name="card.name" :status="card.status" :birthday="card.birthday" :img="card.img" />
-            </router-link>
-          </div>
-        </div>
-      </div>
+      <div class="catalog__footer" v-if="showCatalogFooter === true">
+        <Pagination
+          :count="count"
+          :limit="limit"
+          :currentPage="currentPage"
+          :pages="pages"
+          @onChangePage="changePages"
+          @onPrevPage="prevPage"
+          @onNextPage="nextPage"
+        />
 
-      <div class="catalog__footer" v-if="showCatalogFooter == true">
-        <ul class="pagination">
-          <li class="pagination__item" :class="{ active: page == currentPage }" v-for="page in pages" :key="page"
-            @click="paginationCharacters(page)">
-            {{ page }}</li>
-
-          <div class="pagination__btns">
-
-            <button class="pagination__btn" @click="prevPage"><svg width="18" height="18" viewBox="0 0 18 18"
-                fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M10 1L2 9M2 9L10 17M2 9H18" stroke="#FFD930" stroke-width="2" />
-              </svg></button>
-
-            <button class="pagination__btn" @click="nextPage"><svg width="18" height="18" viewBox="0 0 18 18"
-                fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M8 1L16 9M16 9L8 17M16 9H0" stroke="#FFD930" stroke-width="2" />
-              </svg>
-            </button>
-          </div>
-        </ul>
-        <ul class="show-card">
-          <p class="show-card__text">Отобразить карточек:</p>
-          <li class="show-card__item " :class="{ active: limit == item }" v-for="item in showCard" :key="item"
-            @click="showCardCount(item)"> {{ item }}</li>
-        </ul>
-
+        <CardDisplay
+          :showCard="showCard"
+          :limit="limit"
+          @changeDisplayCard="showCardCount"
+        />
       </div>
     </div>
   </div>
 </template>
-
 <script>
-import Card from "../components/Card.vue";
-import Loader from "../components/Loader.vue"
+import CardList from "@/components/CardList";
+import Card from "@/components/Card";
+import CardDisplay from "@/components/CardDispaly";
+import Pagination from "@/components/Pagination";
+import Loader from "@/components/Loader";
+import Search from "@/components/Search";
 export default {
   components: {
+    CardList,
     Card,
+    CardDisplay,
+    Pagination,
     Loader,
+    Search,
   },
   data() {
     return {
-      cards: null,
+      persons: null,
       isLoading: false,
-      searchValue: "",
-      personSearch: null,
-      showCard: [10, 15, 20, 25],
+      showCard: [10, 15, 20, 25, 30],
       limit: 10,
       grid: false,
-      count: null,
-      limit: 10,
+      count: 62,
       currentPage: 1,
+      searchEmpty: false,
+      showBtnBackCatalog: false,
       showCatalogFooter: false,
     };
   },
   computed: {
     pages() {
-      const pages = Math.ceil(this.count / this.limit)
+      const pages = Math.ceil(this.count / this.limit);
       const arr = [];
       for (let i = 1; i <= pages; i++) {
-        arr.push(i)
+        arr.push(i);
       }
       return arr;
     },
@@ -124,9 +107,13 @@ export default {
       return this.currentPage * this.limit - this.limit;
     },
   },
+  // created() {
+  //   if (this.$route.query.page) {
+  //     this.changePages(Number(this.$route.query.page));
+  //   }
+  // },
   mounted() {
     this.getPersonsAll();
-    this.getPersons();
   },
   watch: {
     limit() {
@@ -137,47 +124,54 @@ export default {
     },
   },
   methods: {
-    getPersons() {
-      fetch(`https://www.breakingbadapi.com/api/characters`)
-        .then((res) => res.json())
-        .then((data) => {
-          this.count = data.length;
-        });
-    },
     getPersonsAll() {
-      this.cards = null;
+      this.persons = null;
       this.isLoading = true;
-      fetch(`https://www.breakingbadapi.com/api/characters?limit=${this.limit}&offset=${this.offset}`)
+      this.showBtnBackCatalog = false;
+      this.searchEmpty = false;
+      fetch(
+        `https://www.breakingbadapi.com/api/characters?limit=${this.limit}&offset=${this.offset}`
+      )
         .then((res) => res.json())
-        .then((catalog) => {
-          this.cards = catalog;
+        .then((persons) => {
+          this.persons = persons;
           this.isLoading = false;
           this.showCatalogFooter = true;
         });
     },
-    searchPerson() {
-      if (this.searchValue == "") {
+    searchPersons(searchValue) {
+      if (searchValue === "") {
         return;
       }
-      this.cards = null;
+      this.searchEmpty = false;
+      this.showBtnBackCatalog = false;
+      this.showCatalogFooter = false;
+      this.persons = null;
       this.isLoading = true;
-      fetch(`https://www.breakingbadapi.com/api/characters?name=${this.searchValue}`)
+      fetch(`https://www.breakingbadapi.com/api/characters?name=${searchValue}`)
         .then((res) => res.json())
+
         .then((persons) => {
-          this.personSearch = persons;
+          if (persons.length === 0) {
+            this.searchEmpty = true;
+          }
+          this.showBtnBackCatalog = true;
+          this.persons = persons;
           this.isLoading = false;
         });
-      this.searchValue = "";
     },
-    showCardCount(item) {
-      this.limit = item;
-      const newPages = Math.ceil(this.count / item);
-      if (newPages <= currentPage) {
-        this.currentPage = newPage;
+    showCardCount(num) {
+      this.limit = num;
+
+      const newCurrentPage = Math.ceil(this.count / num);
+
+      if (newCurrentPage <= this.currentPage) {
+        this.currentPage = newCurrentPage;
       }
     },
-    paginationCharacters(page) {
+    changePages(page) {
       this.currentPage = page;
+      // this.$router.push({ query: { page } });
     },
     prevPage() {
       if (this.currentPage <= 1) return;
@@ -192,189 +186,82 @@ export default {
 </script>
 
 <style lang="scss">
-.pagination {
-  display: flex;
-  align-items: center;
-}
-
-.pagination__btns {
-  display: flex;
-  gap: 24px;
-}
-
-.pagination__btn {
-  background: none;
-}
-
-.pagination__item {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 32px;
-  height: 32px;
-  cursor: pointer;
-
-  &.active {
-    background: #ffffff;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-    border-radius: 4px;
-    color: #ffd930;
-  }
-}
-
-.cards-titles {
-  display: flex;
-  margin-bottom: 24px;
-}
-
-.cards-titles__status {
-  margin-left: 110px;
-}
-
-.cards-titles__name {
-  margin-left: 210px;
-}
-
-.cards-titles__birthday {
-  margin-left: 300px;
-}
-
 .catalog {
   padding-top: 80px;
   padding-bottom: 80px;
-}
-
-.search {
-  display: flex;
-  background: #FFFFFF;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-  border-radius: 4px;
-  max-width: 790px;
-  width: 100%;
-  height: 56px;
-  margin: 0 auto;
-  margin-bottom: 80px;
-  padding-left: 24px;
-  justify-content: space-between;
-}
-
-.search__input {
-  width: 100%;
-}
-
-.search__input::placeholder {
-  opacity: 0.4;
-}
-
-.search__svg {
-  margin-right: 13px;
-}
-
-.search__button {
-  padding: 16px 24px;
-  display: flex;
-  background: none;
-  align-items: center;
-  border-radius: 4px;
-  transition: all 0.3s;
-
-  &:hover {
-    background-color: #FFD930;
-    color: #FFFFFF;
-
-    path {
-      fill: #FFFFFF;
-    }
+  @media (max-width: 480px) {
+    padding-top: 40px;
+    padding-bottom: 40px;
   }
 }
-
 .catalog__top {
   display: flex;
   justify-content: space-between;
   margin-bottom: 25px;
   align-items: center;
 }
-
 .catalog__title {
   font-weight: 500;
   font-size: 32px;
   line-height: 40px;
 }
-
 .catalog__icons {
   display: flex;
   gap: 16px;
   align-items: center;
 }
-
 .catalog__svg {
+  width: 24px;
+  height: 24px;
   cursor: pointer;
-
+  stroke: #2d2d2d;
   &.active {
-    rect {
-      stroke: #FFD930;
-    }
+    stroke: #ffd930;
   }
 }
-
 .cards-titles {
   display: flex;
 }
-
 .catalog__content {
   margin-bottom: 48px;
   min-height: 570px;
-}
-
-.card-list {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  column-gap: 32px;
-  row-gap: 24px;
-  min-height: 270px;
-
-  @media (max-width: 1000px) {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  @media (max-width: 576px) {
-    grid-template-columns: 1fr;
-  }
-
-  &.active {
-    grid-template-columns: 1fr;
-    gap: 0;
-
-    .card-item:last-child {
-      border-bottom: 1px solid #a9a9a9;
+  &.no-result {
+    min-height: 170px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    .card-list {
+      display: none;
     }
   }
 }
+.catalog__no-result {
+  font-size: 30px;
+}
+.catalog__back {
+  margin-top: 20px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  background: none;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 24px;
+  color: #2d2d2d;
+  transition: color 0.3s;
 
+  &:hover {
+    color: #ffd930;
+  }
+}
 .catalog__footer {
   display: flex;
   justify-content: space-between;
-}
-
-.show-card {
-  display: flex;
-  gap: 25px;
-  align-items: center;
-}
-
-.show-card__item {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 32px;
-  height: 32px;
-  cursor: pointer;
-
-  &.active {
-    background: #FFFFFF;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-    border-radius: 4px;
-    color: #ffd930;
+  @media (max-width: 820px) {
+    align-items: center;
+    flex-direction: column;
+    gap: 20px;
   }
 }
 </style>

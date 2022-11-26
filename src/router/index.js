@@ -1,35 +1,35 @@
-import { createRouter, createWebHistory } from 'vue-router';
-import MainPage from '../pages/MainPage';
-import CatalogPage from '../pages/CatalogPage';
-import PersonaPage from '../pages/PersonaPage';
-import NotFoundPage from '../pages/NotFoundPage';
+import { createRouter, createWebHashHistory } from "vue-router";
+import MainPage from "../pages/MainPage";
+import CatalogPage from "../pages/CatalogPage";
+import PersonPage from "../pages/PersonPage";
+import NotFoundPage from "../pages/NotFoundPage";
 
 const routes = [
   {
-    path: '/',
-    name: 'main',
+    path: "/",
+    name: "main",
     component: MainPage,
   },
   {
-    path: '/catalog',
-    name: 'catalog',
+    path: "/catalog",
+    name: "catalog",
     component: CatalogPage,
   },
   {
-    path: '/persona/:id',
-    name: 'persona',
-    component: PersonaPage,
+    path: "/person/:id",
+    name: "person",
+    component: PersonPage,
   },
   {
     path: "/:pathMatch(.*)*",
     name: "not-found",
     component: NotFoundPage,
   },
-]
+];
 
 const router = createRouter({
-  history: createWebHistory(),
-  routes
-})
+  history: createWebHashHistory(),
+  routes,
+});
 
-export default router
+export default router;
